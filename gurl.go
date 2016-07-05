@@ -24,7 +24,7 @@ const (
 	DATABASE = dbUSERNAME + ":" + dbPASS + "@/" + dbNAME + "?charset=utf8"
 )
 
-var templates = template.Must(template.ParseFiles("assets/index.html"))
+var templates = template.Must(template.ParseFiles("index.html"))
 
 func newName() string {
 	id := uniuri.NewLen(LENGTH)
