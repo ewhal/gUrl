@@ -44,16 +44,15 @@ func newName() string {
 
 func newHandler(w http.ResponseWriter, r *http.Request) {
 	url := r.FormValue("url")
-	expiry := r.FormValue("expiry")
 	id := newName()
 	db, err := sql.Open("mysql", DATABASE)
 	if err != nil {
 		log.Println(err)
 	}
 	defer db.Close()
-	stm, err := db.Prepare("insert into urls values(?, ?, ?)")
+	stm, err := db.Prepare("insert into urls values(?, ?)")
 	shorten := ADDRESS + "/s/" + id
-	_, err = stm.Exec(id, html.EscapeString(url), html.EscapeString(expiry))
+	_, err = stm.Exec(id, html.EscapeString(url))
 	if err != nil {
 		log.Println(err)
 	}
@@ -78,8 +77,8 @@ func urlHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer db.Close()
 
-	var url, expiry string
-	err = db.QueryRow("select url, expiry from url where id=?", html.EscapeString(id)).Scan(&url, &expiry)
+	var url string
+	err = db.QueryRow("select url from url where id=?", html.EscapeString(id)).Scan(&url)
 	if err != nil {
 		log.Println(err)
 	}
