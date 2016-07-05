@@ -26,18 +26,34 @@ const (
 
 var templates = template.Must(template.ParseFiles("assets/index.html"))
 
-func newHandler(w http.ResponseWriter, r *http.Request) {
-	url := r.FormValue("url")
-	expiry := r.FormValue("expiry")
+func newName() string {
 	id := uniuri.NewLen(LENGTH)
 	db, err := sql.Open("mysql", DATABASE)
 	if err != nil {
 		log.Println(err)
 	}
-	shorten := ADDRESS + "/s/" + id
+	defer db.Close()
+	var dbID string
+	err = db.QueryRow("select id from urls where id=?", id).Scan(&dbID)
+	if err != sql.ErrNoRows {
+		newName()
+	}
+
+	return id
+}
+
+func newHandler(w http.ResponseWriter, r *http.Request) {
+	url := r.FormValue("url")
+	expiry := r.FormValue("expiry")
+	id := newName()
+	db, err := sql.Open("mysql", DATABASE)
+	if err != nil {
+		log.Println(err)
+	}
 	defer db.Close()
 	stm, err := db.Prepare("insert into urls values(?, ?, ?)")
-	_, err = stm.Exec(id, html.EscapeString(url), expiry)
+	shorten := ADDRESS + "/s/" + id
+	_, err = stm.Exec(id, html.EscapeString(url), html.EscapeString(expiry))
 	if err != nil {
 		log.Println(err)
 	}
