@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"log"
 	"net/http"
 
@@ -9,7 +10,12 @@ import (
 
 const (
 	//PORT that gurl will listen on
-	PORT = ":8000"
+	PORT       = ":8000"
+	dbNAME     = ""
+	dbPASS     = ""
+	dbUSERNAME = ""
+
+	DATABASE = dbUSERNAME + ":" + dbPASS + "@/" + dbNAME + "?charset=utf8"
 )
 
 func newHandler(w http.ResponseWriter, r *http.Request) {
@@ -25,6 +31,13 @@ func delHandler(w http.ResponseWriter, r *http.Request) {
 func urlHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	url := vars["urlid"]
+	db, err := sql.Open("mysql", DATABASE)
+	if err != nil {
+		log.Println(err)
+	}
+	defer db.Close()
+
+	http.Redirect(w, r, url, 303)
 
 }
 
