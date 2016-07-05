@@ -34,10 +34,11 @@ func newName() string {
 		log.Println(err)
 	}
 	defer db.Close()
-	var dbID string
-	err = db.QueryRow("select id from urls where id=?", id).Scan(&dbID)
+	query, err := db.Query("select id from url where id=?", id)
 	if err != sql.ErrNoRows {
-		newName()
+		for query.Next() {
+			newName()
+		}
 	}
 
 	return id
@@ -51,7 +52,7 @@ func newHandler(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 	}
 	defer db.Close()
-	stm, err := db.Prepare("insert into urls values(?, ?)")
+	stm, err := db.Prepare("insert into url values(?, ?)")
 	shorten := ADDRESS + "/s/" + id
 	_, err = stm.Exec(id, html.EscapeString(url))
 	if err != nil {
