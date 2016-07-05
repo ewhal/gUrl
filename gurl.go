@@ -9,6 +9,7 @@ import (
 	"net/http"
 
 	"github.com/dchest/uniuri"
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
 )
 
