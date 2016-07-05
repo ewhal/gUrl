@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"html"
+	"io"
 	"log"
 	"net/http"
 
@@ -17,6 +18,7 @@ const (
 	dbPASS     = ""
 	dbUSERNAME = ""
 	LENGTH     = 6
+	ADDRESS    = "localhost:8000"
 
 	DATABASE = dbUSERNAME + ":" + dbPASS + "@/" + dbNAME + "?charset=utf8"
 )
@@ -25,6 +27,19 @@ func newHandler(w http.ResponseWriter, r *http.Request) {
 	url := r.FormValue("url")
 	expiry := r.FormValue("expiry")
 	id := uniuri.NewLen(LENGTH)
+	db, err := sql.Open("mysql", DATABASE)
+	if err != nil {
+		log.Println(err)
+	}
+	shorten := ADDRESS + "/s/" + id
+	defer db.Close()
+	stm, err := db.Prepare("insert into urls values(?, ?, ?)")
+	_, err = stm.Exec(id, html.EscapeString(url), expiry)
+	if err != nil {
+		log.Println(err)
+	}
+	w.Header().Set("Content-Type", "text/html")
+	io.WriteString(w, "<p><b>URL</b>: <a href='"+shorten+"'>"+shorten+"</a></p>")
 
 }
 
