@@ -7,6 +7,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/dchest/uniuri"
 	_ "github.com/go-sql-driver/mysql"
@@ -52,9 +53,9 @@ func newHandler(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 	}
 	defer db.Close()
-	stm, err := db.Prepare("insert into url values(?, ?)")
+	stm, err := db.Prepare("insert into url values(?, ?, ?)")
 	shorten := ADDRESS + "/s/" + id
-	_, err = stm.Exec(id, html.EscapeString(url))
+	_, err = stm.Exec(id, html.EscapeString(url), time.Now().Format("2016-02-01 12:05:12"))
 	if err != nil {
 		log.Println(err)
 	}
