@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"html"
+	"html/template"
 	"io"
 	"log"
 	"net/http"
@@ -22,6 +23,8 @@ const (
 
 	DATABASE = dbUSERNAME + ":" + dbPASS + "@/" + dbNAME + "?charset=utf8"
 )
+
+var templates = template.Must(template.ParseFiles("assets/index.html"))
 
 func newHandler(w http.ResponseWriter, r *http.Request) {
 	url := r.FormValue("url")
@@ -70,6 +73,10 @@ func urlHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func rootHandler(w http.ResponseWriter, r *http.Request) {
+	err := templates.Execute(w, "index.html")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 
 }
 
