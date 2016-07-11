@@ -1,0 +1,8 @@
+language: go
+
+go:
+  - tip
+
+install:
+script:
+- make
