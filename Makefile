@@ -9,7 +9,9 @@ build:
 	go build $(GOFLAGS) ./...
 
 install:
-	go get $(GOFLAGS) ./...
+	go get github.com/dchest/uniuri
+	go get github.com/gorilla/mux
+	go get github.com/go-sql-driver/mysql
 
 test: install
 	go test $(GOFLAGS) ./...
