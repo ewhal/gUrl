@@ -1,5 +1,5 @@
 // package gurl is a simple url shortening service
-package main
+package gurl
 
 import (
 	"database/sql"
