@@ -3,11 +3,13 @@ package main
 
 import (
 	"database/sql"
+	"encoding/json"
 	"html"
 	"html/template"
 	"io"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	// for random string generation
@@ -18,23 +20,23 @@ import (
 	"github.com/gorilla/mux"
 )
 
-const (
-	//PORT that gurl will listen on
-	PORT = ":8000"
+type Configuration struct {
+	//Port that gurl will listen on
+	Port string
 	// dbNAME database name
-	dbNAME = ""
-	// dbPASS database password
-	dbPASS = ""
-	// dbUSERNAME database username
-	dbUSERNAME = ""
+	Name string
+	// Pass database password
+	Pass string
+	// Username database username
+	Username string
 	// LENGTH url length
-	LENGTH = 6
+	Length int
 	// ADDRESS url for shortening service
-	ADDRESS = "localhost:8000"
+	Address string
+}
 
-	// DATABASE connection string
-	DATABASE = dbUSERNAME + ":" + dbPASS + "@/" + dbNAME + "?charset=utf8"
-)
+var configuration Configuration
+var DATABASE = configuration.Username + ":" + configuration.Pass + "@/" + configuration.Name + "?charset=utf8"
 
 // template file
 var templates = template.Must(template.ParseFiles("index.html"))
@@ -132,13 +134,25 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+
+	file, err := os.Open("config.json")
+	if err != nil {
+		panic(err)
+	}
+	decoder := json.NewDecoder(file)
+	configuration = Configuration{}
+	err = decoder.Decode(&configuration)
+	if err != nil {
+		panic(err)
+	}
+
 	// new mux router
 	router := mux.NewRouter()
 	router.HandleFunc("/new", newHandler)
 	router.HandleFunc("/s/{urlid}", urlHandler)
 	router.HandleFunc("/", rootHandler)
 	// listen on PORT and serve router
-	err := http.ListenAndServe(PORT, router)
+	err = http.ListenAndServe(PORT, router)
 	if err != nil {
 		log.Fatal(err)
 	}
