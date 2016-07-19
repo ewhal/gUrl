@@ -19,9 +19,9 @@ sudo yum install -y go mariadb-server mariadb
 ### Installing
 
 * go get https://github.com/ewhal/gUrl
-* nano gurl.go
-* Configure port and database details
 * make
+* cp config.example.json config.json
+* nano config.json
 
 ## License
 
