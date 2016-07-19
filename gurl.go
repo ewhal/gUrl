@@ -45,7 +45,7 @@ var templates = template.Must(template.ParseFiles("index.html"))
 // returns string
 func newName() string {
 	// generate a new name
-	id := uniuri.NewLen(LENGTH)
+	id := uniuri.NewLen(configuration.Length)
 	// open db connection
 	db, err := sql.Open("mysql", DATABASE)
 	if err != nil {
@@ -84,7 +84,7 @@ func newHandler(w http.ResponseWriter, r *http.Request) {
 	stm, err := db.Prepare("insert into url values(?, ?, ?)")
 
 	// make shortened url
-	shorten := ADDRESS + "/s/" + id
+	shorten := configuration.Address + "/s/" + id
 
 	// Execute query
 	_, err = stm.Exec(id, html.EscapeString(url), time.Now().Format("2016-02-01 12:05:12"))
@@ -152,7 +152,7 @@ func main() {
 	router.HandleFunc("/s/{urlid}", urlHandler)
 	router.HandleFunc("/", rootHandler)
 	// listen on PORT and serve router
-	err = http.ListenAndServe(PORT, router)
+	err = http.ListenAndServe(configuration.Port, router)
 	if err != nil {
 		log.Fatal(err)
 	}
