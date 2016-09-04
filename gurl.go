@@ -53,12 +53,10 @@ func newName() string {
 	}
 	defer db.Close()
 	// check if name exists in the db
-	query, err := db.Query("select id from url where id=?", id)
+	_, err = db.Query("select id from url where id=?", id)
 	// if name exists call newName again
 	if err != sql.ErrNoRows {
-		for query.Next() {
-			newName()
-		}
+		newName()
 	}
 
 	// return id
