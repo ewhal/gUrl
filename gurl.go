@@ -36,7 +36,7 @@ type Configuration struct {
 }
 
 var configuration Configuration
-var DATABASE = configuration.Username + ":" + configuration.Pass + "@/" + configuration.Name + "?charset=utf8"
+var DATABASE string
 
 // template file
 var templates = template.Must(template.ParseFiles("index.html"))
@@ -140,7 +140,7 @@ func main() {
 		panic(err)
 	}
 	decoder := json.NewDecoder(file)
-	configuration = Configuration{}
+	DATABASE = configuration.Username + ":" + configuration.Pass + "@/" + configuration.Name + "?charset=utf8"
 	err = decoder.Decode(&configuration)
 	if err != nil {
 		panic(err)
